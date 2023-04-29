@@ -44,13 +44,13 @@ fn main() {
     //program <file|contents> <e|d> <iterations> <output_file>(optional)
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 4{
-        println!("Usage: file_encryptor <file|contents> <left|right> <iterations> <output_file>(optional)");
+        println!("Usage: {} <file|contents> <left|right> <iterations> <output_file>(optional)", args[0].clone());
         return;
     }
     let need_file_output: bool = args.len() > 4;
     let encrypt_op: bool = args[2].eq_ignore_ascii_case("left");
     if !encrypt_op && !args[2].eq_ignore_ascii_case("right"){
-        println!("Usage: file_encryptor <file|contents> <left|right> <iterations> <output_file>(optional)");
+        println!("Usage: {} <file|contents> <left|right> <iterations> <output_file>(optional)", args[0].clone());
         return;
     }
     let input: Vec<u8> = fs::read(args[1].to_string()).unwrap_or(args[1].clone().into_bytes());

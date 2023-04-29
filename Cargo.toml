@@ -1,5 +1,5 @@
 [package]
-name = "file_encryptor"
+name = "shift_carry_encryptor"
 version = "0.1.0"
 edition = "2021"
 

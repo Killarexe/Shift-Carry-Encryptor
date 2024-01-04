@@ -1,8 +1,12 @@
-use std::{fs::{self, OpenOptions}, io::Write};
+mod args;
 
-fn shift_left(value: u8, iteration: u8) -> u8 {
+use std::{fs::OpenOptions, io::Write, path::PathBuf};
+use args::*;
+use clap::Parser;
+
+fn shift_carry_left(value: u8, iterations: u8) -> u8 {
     let mut result: u8 = value;
-    for _ in 0..(iteration){
+    for _ in 0..(iterations){
         let has_carry: bool = result >= 128;
         result = result << 1;
         if has_carry {
@@ -12,9 +16,9 @@ fn shift_left(value: u8, iteration: u8) -> u8 {
     result
 }
 
-fn shift_right(value: u8, iteration: u8) -> u8 {
+fn shift_carry_right(value: u8, iterations: u8) -> u8 {
     let mut result: u8 = value;
-    for _ in 0..(iteration){
+    for _ in 0..(iterations){
         let has_carry: bool = (result & 1) == 1;
         result = result >> 1;
         if has_carry {
@@ -24,51 +28,38 @@ fn shift_right(value: u8, iteration: u8) -> u8 {
     result
 }
 
-fn encrypt(input: Vec<u8>, iterations: u8) -> Vec<u8> {
-    let mut result: Vec<u8> = vec![0; input.len()];
-    for i in 0..input.len() {
-        result[i] = !shift_left(input[i], iterations);
+fn process_input(input: Vec<u8>, iterations: u8, direction: bool) -> Vec<u8>{
+    if direction {
+        return input.iter().map(|&value| !shift_carry_left(value, iterations)).collect();
     }
-    result
+    input.iter().map(|&value| shift_carry_right(!value, iterations)).collect()
 }
 
-fn decrypt(input: Vec<u8>, iterations: u8) -> Vec<u8> {
-    let mut result: Vec<u8> = vec![0; input.len()];
-    for i in 0..input.len() {
-        result[i] = shift_right(!input[i], iterations);
+fn process_output(output: Vec<u8>, output_path: Option<PathBuf>) {
+    if let Some(path) = output_path {
+        match OpenOptions::new().write(true).create(true).open(path) {
+            Ok(mut file) => {
+                file.write_all(&output).expect("Failed to write into file...");
+            }
+            Err(err) => {
+                println!("Failed to create/write to file:\n{:#?}", err);
+            }
+        }
+    } else {
+        output.iter().for_each(|&value| print!("{}", value as char));
     }
-    result
 }
 
 fn main() {
-    //program <file|contents> <e|d> <iterations> <output_file>(optional)
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() < 4{
-        println!("Usage: {} <file|contents> <left|right> <iterations> <output_file>(optional)", args[0].clone());
-        return;
-    }
-    let need_file_output: bool = args.len() > 4;
-    let encrypt_op: bool = args[2].eq_ignore_ascii_case("left");
-    if !encrypt_op && !args[2].eq_ignore_ascii_case("right"){
-        println!("Usage: {} <file|contents> <left|right> <iterations> <output_file>(optional)", args[0].clone());
-        return;
-    }
-    let input: Vec<u8> = fs::read(args[1].to_string()).unwrap_or(args[1].clone().into_bytes());
-    let iterations: u8 = args[3].parse::<u8>().expect("Execpted an number");
-    let output;
-    if encrypt_op{
-        output = encrypt(input, iterations);
-    }else{
-        output = decrypt(input, iterations);
-    }
-    if need_file_output{
-        let mut file = OpenOptions::new().write(true).create(true).open(&args[4]).expect("Failed to create output file");
-        file.write_all(&output).expect("Failed to write");
-    }else{
-        for c in output{
-            print!("{}", c as char);
+    let mut args: Args = Args::parse();
+    match args.get_direction() {
+        Some(direction) => {
+            let output: Vec<u8> = process_input(args.get_input(), args.iterations, direction);
+            process_output(output, args.output_path);
+        },
+        None => {
+            println!("No direction found! Please add direction to process! --help for help...");
         }
-        println!();
-    }
-    println!("Terminated successfully!");
+    } 
+    println!("Program terminated!");
 }

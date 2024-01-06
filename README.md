@@ -4,7 +4,13 @@ I Know this is maybe a stupid idea but i made a encryptor that do shift carry op
 
 ## Usage:
 
-`shift_carry_encryptor <file_path|value> <left|right> <iterations> (output_file)`
+| Input | Direction | Nb of iterations | Output file *(optional)* |
+|-------|-----------|------------------|--------------------------|
+|**File path** or **String value**| *"left"* or *"right"* | 1-7 | A file path |
+
+**Warning:**
+
+*If `output_file` is not set then if the input is a file path then it replace it and if it's a string input then it just output it in the console...*
 
 ## Tip:
 
@@ -19,3 +25,10 @@ To encrypt...:
 To decrypt...:
 
 `shift_carry_encryptor bar.txt right 2 foo.txt`
+
+## How it works
+
+The **S**hift **C**arry **E**ncryptor*(SCE in short)* have 2 steps of bit manipulation per bytes in the input:
+
+1. Invert the byte *(e.g: `0110` -> `1001`)*
+2. Shift Carry depending in the direction given *(e.g: Shift carry left 1 -> `1001` -> `0011` | Shift carry right 1 -> `1101` -> `1110`)*

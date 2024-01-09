@@ -1,10 +1,13 @@
 mod args;
 
+#[cfg(test)]
+mod tests;
+
 use std::{fs::OpenOptions, io::Write, path::PathBuf};
 use args::*;
 use clap::Parser;
 
-fn shift_carry_left(value: u8, iterations: u8) -> u8 {
+pub fn shift_carry_left(value: u8, iterations: u8) -> u8 {
     let mut result: u8 = value;
     for _ in 0..(iterations){
         let has_carry: bool = result >= 128;
@@ -16,7 +19,7 @@ fn shift_carry_left(value: u8, iterations: u8) -> u8 {
     result
 }
 
-fn shift_carry_right(value: u8, iterations: u8) -> u8 {
+pub fn shift_carry_right(value: u8, iterations: u8) -> u8 {
     let mut result: u8 = value;
     for _ in 0..(iterations){
         let has_carry: bool = (result & 1) == 1;
@@ -28,14 +31,14 @@ fn shift_carry_right(value: u8, iterations: u8) -> u8 {
     result
 }
 
-fn process_input(input: Vec<u8>, iterations: u8, direction: bool) -> Vec<u8>{
+pub fn process_input(input: Vec<u8>, iterations: u8, direction: bool) -> Vec<u8>{
     if direction {
         return input.iter().map(|&value| !shift_carry_left(value, iterations)).collect();
     }
     input.iter().map(|&value| shift_carry_right(!value, iterations)).collect()
 }
 
-fn process_output(output: Vec<u8>, output_path: Option<PathBuf>) {
+pub fn process_output(output: Vec<u8>, output_path: Option<PathBuf>) {
     if let Some(path) = output_path {
         match OpenOptions::new().write(true).create(true).open(path) {
             Ok(mut file) => {

@@ -4,9 +4,9 @@ I Know this is maybe a stupid idea but i made a encryptor that do shift carry op
 
 ## Usage:
 
-| Input | Direction | Nb of iterations | Output file *(optional)* |
-|-------|-----------|------------------|--------------------------|
-|**File path** or **String value**| *"left"* or *"right"* | 1-7 | A file path |
+| Input | Direction | Nb of iterations | Output file *(optional)* | Inverse output *(optional, ***false by default***)* |
+|-------|-----------|------------------|--------------------------|-----------------------------------------------------|
+|**File path** or **String value**| *"left"* or *"right"* | 1-7 | A file path | *"true"* or "false" |
 
 **Warning:**
 
@@ -30,5 +30,5 @@ To decrypt...:
 
 The **S**hift **C**arry **E**ncryptor*(SCE in short)* have 2 steps of bit manipulation per bytes in the input:
 
-1. Invert the byte *(e.g: `0110` -> `1001`)*
+1. Invert the byte **If `Inverse Output` is set to `true` in the arguments!** *(e.g: `0110` -> `1001`)*
 2. Shift Carry depending in the direction given *(e.g: Shift carry left 1 -> `1001` -> `0011` | Shift carry right 1 -> `1101` -> `1110`)*

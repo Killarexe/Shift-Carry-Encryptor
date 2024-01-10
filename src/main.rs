@@ -31,11 +31,19 @@ pub fn shift_carry_right(value: u8, iterations: u8) -> u8 {
     result
 }
 
-pub fn process_input(input: Vec<u8>, iterations: u8, direction: bool) -> Vec<u8>{
+pub fn process_input(input: Vec<u8>, iterations: u8, direction: bool, invert: bool) -> Vec<u8>{
     if direction {
-        return input.iter().map(|&value| !shift_carry_left(value, iterations)).collect();
+        return input.iter().map(|&value| if invert {
+            !shift_carry_left(value, iterations)
+        } else {
+            shift_carry_left(value, iterations)
+        }).collect();
     }
-    input.iter().map(|&value| shift_carry_right(!value, iterations)).collect()
+    input.iter().map(|&value| if invert { 
+        shift_carry_right(!value, iterations)
+    } else {
+        shift_carry_right(value, iterations)
+    }).collect()
 }
 
 pub fn process_output(output: Vec<u8>, output_path: Option<PathBuf>) {
@@ -57,7 +65,7 @@ fn main() {
     let mut args: Args = Args::parse();
     match args.get_direction() {
         Some(direction) => {
-            let output: Vec<u8> = process_input(args.get_input(), args.iterations, direction);
+            let output: Vec<u8> = process_input(args.get_input(), args.iterations, direction, args.get_invert_output());
             process_output(output, args.output_path);
         },
         None => {

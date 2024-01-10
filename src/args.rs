@@ -12,7 +12,9 @@ pub struct Args {
     /// Number of iterations.
     pub iterations: u8,
     /// Output file.
-    pub output_path: Option<PathBuf>
+    pub output_path: Option<PathBuf>,
+    // Invert the output.
+    invert_output: Option<bool>
 }
 
 impl Args {
@@ -36,5 +38,9 @@ impl Args {
         } else {
             None
         }
+    }
+
+    pub fn get_invert_output(&self) -> bool {
+        self.invert_output.unwrap_or(false)
     }
 }
